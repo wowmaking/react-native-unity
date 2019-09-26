@@ -24,7 +24,7 @@ class UnityManager extends EventTarget {
    */
   init() {
     RNUnity.initialize();
-    this._subscriber = RNUnityEventEmitter.addListener('UnityMessage', this._handleMessage);
+    this._subscriber = RNUnityEventEmitter.addListener('UnityMessage', this._handleMessage.bind(this));
   }
 
   /**
@@ -47,9 +47,11 @@ class UnityManager extends EventTarget {
   _handleMessage(message) {
     try {
       const messageData = JSON.parse(message);
-      const { type, data, } = messageData;
+      const { type, name, data, } = messageData;
 
-      this.dispatchEvent(new CustomEvent(type, data));
+      if (type === 'event') {
+        this.dispatchEvent({ type: name, data, });
+      }
     }
     catch (e) {
       console.warn(e.message);
