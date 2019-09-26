@@ -23,5 +23,8 @@
   "license": "MIT",
   "peerDependencies": {
     "react-native": "^0.41.2"
+  },
+  "dependencies": {
+    "event-target-shim": "^5.0.1"
   }
 }

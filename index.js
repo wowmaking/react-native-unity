@@ -5,6 +5,8 @@ import {
   NativeEventEmitter,
 } from 'react-native';
 
+import { EventTarget, } from 'event-target-shim';
+
 
 const { RNUnity, } = NativeModules;
 const RNUnityEventEmitter = new NativeEventEmitter(RNUnity);
@@ -12,15 +14,18 @@ const RNUnityEventEmitter = new NativeEventEmitter(RNUnity);
 const _handlers = {};
 let _subscriber;
 
-const Unity = {
+class UnityManager extends EventTarget {
+
+  _subscriber = null;
+
   /**
    * 
    * Initialize unity
    */
   init() {
     RNUnity.initialize();
-    _subscriber = RNUnityEventEmitter.addListener('UnityMessage')
-  },
+    this._subscriber = RNUnityEventEmitter.addListener('UnityMessage', this._handleMessage);
+  }
 
   /**
    * 
@@ -32,7 +37,7 @@ const Unity = {
    */
   invoke({ entityName, functionName, message = '', }) {
     RNUnity.invoke(entityName, functionName, message);
-  },
+  }
 
   /**
    * 
@@ -44,47 +49,16 @@ const Unity = {
       const messageData = JSON.parse(message);
       const { type, data, } = messageData;
 
-      if (_handlers[type]) {
-        _handlers[type].forEach((handler) => {
-          if (typeof handler === 'function') {
-            handler(data);
-          }
-        });
-      }
+      this.dispatchEvent(new CustomEvent(type, data));
     }
     catch (e) {
       console.warn(e.message);
     }
-  },
+  }
 
-  /**
-   * 
-   * Add unity messages listeners
-   * @param {string} type Event type
-   * @param {function} handler Event handler
-   */
-  addListener(type, handler) {
-    if (!_handlers[type]) {
-      _handlers[type] = [];
-    }
+}
 
-    _handlers[type].push(handler);
-  },
-
-  /**
-   * 
-   * Remove unity messages listeners
-   * @param {string} type Event type
-   * @param {function} handler Event handler
-   */
-  removeListener(type, handler) {
-    if (_handlers[type]) {
-      _handlers[type] = _handlers[type].filter(h => h !== handler);
-    }
-  },
-
-};
-
+const Unity = new UnityManager();
 const UnityView = requireNativeComponent('UnityResponderView');
 
 export { Unity, UnityView, }
