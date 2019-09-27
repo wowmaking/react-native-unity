@@ -29,7 +29,7 @@
 6. Make `Data` folder to be part of the `UnityFramework`. By default `Data` folder is part of Unity-iPhone target, we change that to make everything encapsulated in one single framework file. Change `Target Membership` for `Data` folder to `UnityFramework`.
 ![Example](https://forum.unity.com/attachments/image4-png.427030/)
 7. Add following lines to your project `main.m` file (located at same folder with `AppDelegate`)
-```
+```objectivec
 #import <UIKit/UIKit.h>
 +++ #import <RNUnity/RNUnity.h>
 
@@ -44,7 +44,7 @@ int main(int argc, char * argv[]) {
 }
 ```
 8. Add following lines to your project `AppDelegate.m` file
-```
+```objectivec
 #import "AppDelegate.h"
 
 #import <React/RCTBridge.h>
@@ -72,24 +72,46 @@ int main(int argc, char * argv[]) {
 
 #### Android
 
-1. Open up `android/app/src/main/java/[...]/MainActivity.java`
-  - Add `import com.reactlibrary.RNUnityPackage;` to the imports at the top of the file
-  - Add `new RNUnityPackage()` to the list returned by the `getPackages()` method
+1. Add ndk support into `android/app/build.gradle`
+    ```gradle
+    defaultConfig {
+        ...
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+        }
+    }
+    ```
 2. Append the following lines to `android/settings.gradle`:
-  	```
-  	include ':@wowmaking/react-native-unity'
-  	project(':@wowmaking/react-native-unity').projectDir = new File(rootProject.projectDir, 	'../node_modules/@wowmaking/react-native-unity/android')
+  	```gradle
+  	include ':unityLibrary'
+    project(':unityLibrary').projectDir=new File('..\\unity\\builds\\android\\unityLibrary')
   	```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
+  	```gradle
+      implementation project(':unityLibrary')
+      implementation files("${project(':unityLibrary').projectDir}/libs/unity-classes.jar")
   	```
-      compile project(':@wowmaking/react-native-unity')
-  	```
+4. Change parent activity in `MainActivity.java` from `ReactActivity` to `UnityReactActivity`
+    ```java
+    public class MainActivity extends UnityReactActivity {
+        ...
+    }
+    ```
 
 ## Usage
 ```javascript
-import RNUnity from '@wowmaking/react-native-unity';
+import { Unity, UnityView } from '@wowmaking/react-native-unity';
 
-// TODO: What to do with the module?
-RNUnity;
+// Don't forget to initialize 
+Unity.init();
+
+const App = () => {
+  return (
+    <View>
+      <!-- UnityView provide all touch events to UnityPlayer -->
+      <UnityView />
+    </View>
+  );
+};
 ```
   
