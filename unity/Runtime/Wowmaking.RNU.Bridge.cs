@@ -4,11 +4,20 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
+using Newtonsoft.Json.Linq;
+
 
 public class NativeAPI
 {
     [DllImport("__Internal")]
     public static extern void sendMessage(string message);
+}
+
+class Result
+{
+    public string type;
+    public string name;
+    public object data;
 }
 
 namespace Wowmaking.RNU
@@ -89,11 +98,12 @@ namespace Wowmaking.RNU
 
         public static void SendEvent(String name, object data)
         {
-            string message = JsonUtility.ToJson(new {
-                  type = "event",
-                  name,
-                  data,
-              });
+            Result r = new Result();
+            r.type = "event";
+            r.name = name;
+            r.data = data;
+
+            string message = JObject.FromObject(r).ToString();
 
             RNBridge.SendMessage(message);
         }
