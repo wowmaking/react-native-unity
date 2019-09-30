@@ -20,6 +20,26 @@ class Result
     public object data;
 }
 
+class EventResult: Result
+{
+    public EventResult()
+    {
+        this.type = "event";
+    }
+}
+
+class CommandResult : Result
+{
+    public int id;
+    public bool resolved;
+
+    public CommandResult()
+    {
+        this.type = "result";
+    }
+}
+
+
 namespace Wowmaking.RNU
 {
 
@@ -98,8 +118,7 @@ namespace Wowmaking.RNU
 
         public static void SendEvent(String name, object data)
         {
-            Result r = new Result();
-            r.type = "event";
+            EventResult r = new EventResult();
             r.name = name;
             r.data = data;
 
@@ -110,14 +129,13 @@ namespace Wowmaking.RNU
 
         public static void SendResult(int id, String name, bool resolved, object data)
         {
-            string message = JsonUtility.ToJson(new
-            {
-                type = "result",
-                id,
-                name,
-                resolved,
-                data,
-            });
+            CommandResult r = new CommandResult();
+            r.id = id;
+            r.name = name;
+            r.resolved = resolved;
+            r.data = data;
+
+            string message = JObject.FromObject(r).ToString();
 
             RNBridge.SendMessage(message);
         }
