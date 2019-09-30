@@ -97,6 +97,22 @@ int main(int argc, char * argv[]) {
         ...
     }
     ```
+5. Add strings to `res/values/strings.xml`
+    ```xml
+    <string name="game_view_content_description">Game view</string>
+    <string name="unity_root">unity_root</string>
+    ```
+6. Update `.MainActivity` into `AndroidManifest.xml`
+    ```xml
+    <activity
+      android:name=".MainActivity"
+      ...
+      android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+      android:hardwareAccelerated="false"
+      android:launchMode="singleTask"
+    >
+    ```
+7. Setup `minSdkVersion` greater than or equal to `19`
     
 #### Unity
 1. Add following line at your `unity/Packages/manifest.json`
