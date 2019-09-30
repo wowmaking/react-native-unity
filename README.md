@@ -113,6 +113,7 @@ int main(int argc, char * argv[]) {
     >
     ```
 7. Setup `minSdkVersion` greater than or equal to `19`
+8. Remove `<intent-filter>...</intent-filter>` from AndroidManifest.xml at unityLibrary to leave only integrated version. 
     
 #### Unity
 1. Add following line at your `unity/Packages/manifest.json`

@@ -145,13 +145,14 @@ namespace Wowmaking.RNU
 #if UNITY_ANDROID
             try
             {
-                AndroidJavaClass jc = new AndroidJavaClass("com.company.product.OverrideUnityActivity");
-                AndroidJavaObject overrideActivity = jc.GetStatic<AndroidJavaObject>("instance");
-                overrideActivity.Call("showMainActivity", lastStringColor);
-            } catch(Exception e)
+                AndroidJavaClass jc = new AndroidJavaClass("com.reactlibrary.UnityReactActivity");
+                AndroidJavaObject unityReactActivity = jc.GetStatic<AndroidJavaObject>("instance");
+                unityReactActivity.Call("sendMessage", message);
+            }
+            catch (Exception e)
             {
-                appendToText("Exception during showHostMainWindow");
-                appendToText(e.Message);
+                Debug.Log("Exception during sendMessage to UnityReactActivity");
+                Debug.Log(e.Message);
             }
 #elif UNITY_IOS
             NativeAPI.sendMessage(message);
