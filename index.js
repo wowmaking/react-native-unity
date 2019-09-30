@@ -101,7 +101,6 @@ class UnityManager extends EventTarget {
           if (this._commandsMap[id]) {
             const command = this._commandsMap[id];
 
-            console.warn(resolved);
             if (resolved) {
               command.resolve(data);
             }
@@ -173,6 +172,6 @@ class UnityCommand {
 }
 
 const Unity = new UnityManager();
-const UnityView = requireNativeComponent('UnityResponderView');
+const UnityResponderView = requireNativeComponent('UnityResponderView');
 
-export { Unity, UnityView, }
+export { Unity, UnityResponderView, }

@@ -10,7 +10,7 @@
 1. Install package via `npm`
 2. Move your Unity project to `unity` folder at project root
 
-#### iOS specific steps
+#### iOS
 
 1. Run `pod install`
 2. Build Unity app to `[project_root]/unity/builds/ios`
@@ -97,21 +97,165 @@ int main(int argc, char * argv[]) {
         ...
     }
     ```
+    
+#### Unity
+1. Add following line at your `unity/Packages/manifest.json`
+    ```json
+    {
+        ...
+        "com.wowmaking.react-native-unity": "file:../../node_modules/@wowmaking/react-native-unity/unity"
+    }
+    ```
+2. Right-click at you `Hierarchy` menu, then click `Create Empty`, rename new game object (example: `UICommandsDelegate`). **IMPORTANT! Remember the name of new game object, that needed to initialize JavaScript lib.**
+3. Add script `RNCommadsDelegate.cs` to new game object (step 2) (location: `Packages/react-native-unity/Runtime/Scripts`)
+4. To receive commands from JavaScript, you must create another game object, or use existing. Commands receiver object must implements `IRNCommandsReceiver` interface
+    ```c
+    using Wowmaking.RNU;
+    
+    public class NewGameObject : MonoBehaviour, IRNCommandsReceiver
+    {
+    ...
+    }
+    ```
+5. Set your object as commands receiver to `RNBridge` on `Awake`
+    ```c
+    using Wowmaking.RNU;
+    
+    public class NewGameObject : MonoBehaviour, IRNCommandsReceiver
+    {
+        private void Awake()
+        {
+            RNBridge.SetCommandsReceiver(this);
+        }
+    }
+    ```
+6. Implement `IRNCommandsReceiver` interface by adding `HandleCommand` method
+    ```c
+    using Wowmaking.RNU;
+    
+    public class NewGameObject : MonoBehaviour, IRNCommandsReceiver
+    {
+        private void Awake()
+        {
+            RNBridge.SetCommandsReceiver(this);
+        }
+        
+        public void HandleCommand(RNCommand command)
+        {
+            switch (command.name)
+            {
+                // command.Resolve(new {}) || command.Reject(new {})
+            }
+        }
+    }
+    ``` 
+    **IMPORTANT! Call `Resolve` or `Reject` method of received `RNCommand` instance to remove it from JavaScript thread**
 
 ## Usage
 ```javascript
-import { Unity, UnityView } from '@wowmaking/react-native-unity';
+import { Unity, UnityResponderView } from '@wowmaking/react-native-unity';
 
-// Don't forget to initialize 
-Unity.init();
+// Don't forget to initialize with name of GameObject, that you create at `Unity`->`Step 2`
+Unity.init('UICommandsDelegate');
 
 const App = () => {
   return (
     <View>
-      <!-- UnityView provide all touch events to UnityPlayer -->
-      <UnityView />
+      <!-- UnityResponderView provide all touch events to Unity -->
+      <UnityResponderView />
+      <Touchable onPress={()=>Unity.execCommand('command_name', { /* any specific command data */ })}>Press ME!</Touchable>
     </View>
   );
 };
 ```
-  
+
+## JavaScript API
+
+##### **`Unity`** - main module object
+###### Methods:
+1. `init` - initialize `react-native-unity` lib
+    Params: 
+    - `delegateName` (`string`) - name of Unity GameObject, that was created at `Unity`->`Step 2`
+    
+    Usage:
+    ```javascript
+    Unity.init('UICommandsDelegate');
+    ```
+2. `execCommand` - send command to Unity
+    Params: 
+    - `name` (`string`) - Unity command name
+    - `data` (`Object`, optional) - Unity command data
+    
+    Return `Promise`
+    Usage:
+    ```javascript
+    Unity.execCommand('command_name', { a: 1, b: 'b', })
+    ```
+3. `addEventListener` - add listener of Unity events
+    Params:
+        - `type` (`string`) - type of Unity event
+        - `listener` (`function`) - function, that's calling on Unity event receiving
+        
+    Usage:
+    ```javascript
+    Unity.addEventListener('event_type', (e) => { console.warn(e); });
+    ```
+4. `removeEventListener` - remove Unity event listener
+   Params:
+        - `type` (`string`) - type of Unity event
+        - `listener` (`function`) - specific listener to remove
+        
+    Usage:
+    ```javascript
+    Unity.addEventListener('event_type', listener });
+    ```
+    
+##### **`UnityResponderView`** - React-component, that provide all touch events to Unity
+
+## Unity API
+##### **Package namespace is `Wowmaking.RNU`**
+#
+##### **`interface IRNCommandsReceiver`** - interface to receive commands from JaveScript
+###### Methods:
+1. `void HandleCommand(RNCommand command)` - method, that calls from JavaScript
+    Params:
+    - `command` (`RNCommand`) - command object, received from JavaScript
+    
+##### **`RNCommand`** - class of reciving JavaScript commands
+###### Properties
+1. `name` (`string`) - name of received command
+2. `data` ('object') - data of received command
+###### Methods
+1. `Resolve` - invoke on successful command execution
+    Params:
+    - `data` (`object`, optional) - object, that will receive JavaScript
+        
+    Usage:
+    ```c
+    command.Resolve(new { text = "test", });
+    ```
+2. `Reject` - invoke on unsuccessful command execution
+    Params:
+    - `data` (`object`, optional) - object, that will receive JavaScript
+        
+    Usage:
+    ```c
+    command.Reject(new { text = "test", });
+    ```
+##### **`static RNBridge`**
+###### Methods
+1. `SetCommandsReceiver` - set commands reveiver to bridge
+    Params:
+    - `cReceiver` (`IRNCommandsReceiver`) - game object, that implements IRNCommandsReceiver interface
+        
+    Usage:
+    ```c
+    private void Awake()
+    {
+        RNBridge.SetCommandsReceiver(this);
+    }
+    ```
+2. `SendEvent` - send event to JavaScript
+    Params:
+    - `name` (`string`) - event name, that receive JavaScript
+    - `data` (`object`) - data object, that receive JavaScript listeners
