@@ -8,6 +8,6 @@ public class RNCommadsDelegate : MonoBehaviour, IRNCommandsDelegate
 
     public void HandleCommand(string message)
     {
-        RNBridge.SendCommandToReciever(message);
+        RNBridge.SendCommandToReceiver(message);
     }
 }
