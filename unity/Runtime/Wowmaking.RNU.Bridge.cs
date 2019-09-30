@@ -48,7 +48,7 @@ namespace Wowmaking.RNU
         void HandleCommand(string message);
     }
 
-    public interface IRNCommandsReciever
+    public interface IRNCommandsReceiver
     {
         void HandleCommand(RNCommand command);
     }
@@ -93,21 +93,21 @@ namespace Wowmaking.RNU
     public static class RNBridge
     {
 
-        private static IRNCommandsReciever commandsReciever = null;
+        private static IRNCommandsReceiver commandsReceiver = null;
 
-        public static void SetCommandsReciever(IRNCommandsReciever cReciever)
+        public static void SetCommandsReceiver(IRNCommandsReceiver cReceiver)
         {
-            RNBridge.commandsReciever = cReciever;
+            RNBridge.commandsReceiver = cReceiver;
         }
 
-        public static void SendCommandToReciever(string message)
+        public static void SendCommandToReceiver(string message)
         {
-            if (RNBridge.commandsReciever == null)
+            if (RNBridge.commandsReceiver == null)
             {
                 return;
             }
 
-            RNBridge.commandsReciever.HandleCommand(RNBridge.CreateCommand(message));
+            RNBridge.commandsReceiver.HandleCommand(RNBridge.CreateCommand(message));
         }
 
 
