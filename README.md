@@ -10,6 +10,68 @@
 1. Install package via `npm`
 2. Move your Unity project to `unity` folder at project root
 
+#### Unity (Setup your Unity project first)
+1. Add following line at your `unity/Packages/manifest.json`
+    ```json
+    {
+        ...
+        "com.wowmaking.react-native-unity": "file:../../node_modules/@wowmaking/react-native-unity/unity"
+    }
+    ```
+2. Right-click at you `Hierarchy` menu, then click `Create Empty`, rename new game object (example: `UICommandsDelegate`). **IMPORTANT! Remember the name of new game object, that needed to initialize JavaScript lib.**
+3. Add script `RNCommadsDelegate.cs` to new game object (step 2) (location: `Packages/react-native-unity/Runtime/Scripts`)
+4. To receive commands from JavaScript, you must create another game object, or use existing. Commands receiver object must implements `IRNCommandsReceiver` interface
+    ```c
+    using Wowmaking.RNU;
+    
+    public class NewGameObject : MonoBehaviour, IRNCommandsReceiver
+    {
+    ...
+    }
+    ```
+5. Set your object as commands receiver to `RNBridge` on `Awake`
+    ```c
+    using Wowmaking.RNU;
+    
+    public class NewGameObject : MonoBehaviour, IRNCommandsReceiver
+    {
+        private void Awake()
+        {
+            RNBridge.SetCommandsReceiver(this);
+        }
+    }
+    ```
+6. Implement `IRNCommandsReceiver` interface by adding `HandleCommand` method
+    ```c
+    using Wowmaking.RNU;
+    
+    public class NewGameObject : MonoBehaviour, IRNCommandsReceiver
+    {
+        private void Awake()
+        {
+            RNBridge.SetCommandsReceiver(this);
+        }
+        
+        public void HandleCommand(RNCommand command)
+        {
+            switch (command.name)
+            {
+                // command.Resolve(new {}) || command.Reject(new {})
+            }
+        }
+    }
+    ``` 
+    **IMPORTANT! Call `Resolve` or `Reject` method of received `RNCommand` instance to remove it from JavaScript thread**
+    
+##### iOS simulator settings
+If you want to test your app at xcode simulator, you need following next steps:
+1. Go to `Menu` -> `Edit` -> `Project setings...` -> `Player` -> `iOS` -> `Other Settings`
+2. Remove check from `Auto Graphics API`
+3. Add `OpenGLES3` to `Graphics APIs` list by clicking `+`
+4. Find `Target SDK` setting and select `Simulator SDK`
+
+You ready to debug your app at simulator!
+
 #### iOS
 
 1. Run `pod install`
@@ -114,59 +176,6 @@ int main(int argc, char * argv[]) {
     ```
 7. Setup `minSdkVersion` greater than or equal to `19`
 8. Remove `<intent-filter>...</intent-filter>` from AndroidManifest.xml at unityLibrary to leave only integrated version. 
-    
-#### Unity
-1. Add following line at your `unity/Packages/manifest.json`
-    ```json
-    {
-        ...
-        "com.wowmaking.react-native-unity": "file:../../node_modules/@wowmaking/react-native-unity/unity"
-    }
-    ```
-2. Right-click at you `Hierarchy` menu, then click `Create Empty`, rename new game object (example: `UICommandsDelegate`). **IMPORTANT! Remember the name of new game object, that needed to initialize JavaScript lib.**
-3. Add script `RNCommadsDelegate.cs` to new game object (step 2) (location: `Packages/react-native-unity/Runtime/Scripts`)
-4. To receive commands from JavaScript, you must create another game object, or use existing. Commands receiver object must implements `IRNCommandsReceiver` interface
-    ```c
-    using Wowmaking.RNU;
-    
-    public class NewGameObject : MonoBehaviour, IRNCommandsReceiver
-    {
-    ...
-    }
-    ```
-5. Set your object as commands receiver to `RNBridge` on `Awake`
-    ```c
-    using Wowmaking.RNU;
-    
-    public class NewGameObject : MonoBehaviour, IRNCommandsReceiver
-    {
-        private void Awake()
-        {
-            RNBridge.SetCommandsReceiver(this);
-        }
-    }
-    ```
-6. Implement `IRNCommandsReceiver` interface by adding `HandleCommand` method
-    ```c
-    using Wowmaking.RNU;
-    
-    public class NewGameObject : MonoBehaviour, IRNCommandsReceiver
-    {
-        private void Awake()
-        {
-            RNBridge.SetCommandsReceiver(this);
-        }
-        
-        public void HandleCommand(RNCommand command)
-        {
-            switch (command.name)
-            {
-                // command.Resolve(new {}) || command.Reject(new {})
-            }
-        }
-    }
-    ``` 
-    **IMPORTANT! Call `Resolve` or `Reject` method of received `RNCommand` instance to remove it from JavaScript thread**
 
 ## Usage
 ```javascript
