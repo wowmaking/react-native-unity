@@ -132,6 +132,8 @@ int main(int argc, char * argv[]) {
 @end
 ```
 
+9. Add `UnityFramework` to your project scheme. Select you project scheme -> `Edit scheme...` -> `Build` -> Click `+` -> Select `UnityFramework` from list -> move `UnityFramework` before your app (drag and drop)
+
 #### Android
 
 1. Add ndk support into `android/app/build.gradle`
