@@ -58,7 +58,7 @@ namespace Wowmaking.RNU
 
         public int id;
         public string name;
-        public object data;
+        public JObject data;
         public bool resolved;
 
         private bool completed = false;
