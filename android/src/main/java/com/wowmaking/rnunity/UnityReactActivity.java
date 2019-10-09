@@ -1,4 +1,4 @@
-package com.reactlibrary;
+package com.wowmaking.rnunity;
 
 import android.content.Intent;
 import android.content.res.Configuration;

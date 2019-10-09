@@ -145,7 +145,7 @@ namespace Wowmaking.RNU
 #if UNITY_ANDROID
             try
             {
-                AndroidJavaClass jc = new AndroidJavaClass("com.reactlibrary.UnityReactActivity");
+                AndroidJavaClass jc = new AndroidJavaClass("com.wowmaking.rnunity.UnityReactActivity");
                 AndroidJavaObject unityReactActivity = jc.GetStatic<AndroidJavaObject>("instance");
                 unityReactActivity.Call("sendMessage", message);
             }

@@ -157,6 +157,8 @@ int main(int argc, char * argv[]) {
   	```
 4. Change parent activity in `MainActivity.java` from `ReactActivity` to `UnityReactActivity`
     ```java
+    import com.wowmaking.rnunity.UnityReactActivity;
+
     public class MainActivity extends UnityReactActivity {
         ...
     }

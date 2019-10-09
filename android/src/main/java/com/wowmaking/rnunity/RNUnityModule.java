@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package com.wowmaking.rnunity;
 
 import androidx.annotation.Nullable;
 
