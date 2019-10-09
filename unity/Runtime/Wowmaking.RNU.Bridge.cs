@@ -20,7 +20,7 @@ class Result
     public object data;
 }
 
-class EventResult: Result
+class EventResult : Result
 {
     public EventResult()
     {
@@ -111,8 +111,16 @@ namespace Wowmaking.RNU
         }
 
 
-        public static RNCommand CreateCommand(string message) {
-            return JsonUtility.FromJson<RNCommand>(message);
+        public static RNCommand CreateCommand(string message)
+        {
+            var c = new RNCommand();
+            var o = JObject.Parse(message);
+
+            c.id = (int)o["id"];
+            c.name = (string)o["name"];
+            c.data = (JObject)o["data"];
+
+            return c;
         }
 
 
