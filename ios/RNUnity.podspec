@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.source_files  = "**/*.{h,m}"
   s.requires_arc = true
 
-  s.xcconfig = { 'FRAMEWORK_SEARCH_PATHS' => '$(BUILD_ROOT)/**' }
+  s.xcconfig = { 'FRAMEWORK_SEARCH_PATHS' => '$(inherited) $(BUILD_ROOT)/** $(CONFIGURATION_BUILD_DIR)/../**' }
 
   s.framework ='UnityFramework'
 
