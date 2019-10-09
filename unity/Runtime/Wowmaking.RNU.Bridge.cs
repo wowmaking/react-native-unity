@@ -63,13 +63,13 @@ namespace Wowmaking.RNU
 
         private bool completed = false;
 
-        public void Resolve(object resultData = null)
+        public virtual void Resolve(object resultData = null)
         {
             this.resolved = true;
             this.SendResult(resultData);
         }
 
-        public void Reject(object resultData = null)
+        public virtual void Reject(object resultData = null)
         {
             this.resolved = false;
             this.SendResult(resultData);
