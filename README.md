@@ -132,7 +132,12 @@ int main(int argc, char * argv[]) {
 @end
 ```
 
-9. Add `UnityFramework` to your project scheme. Select you project scheme -> `Edit scheme...` -> `Build` -> Click `+` -> Select `UnityFramework` from list -> move `UnityFramework` before your app (drag and drop)
+9. In `AppDelegate.m` file make background color of React root view transparent
+```objectivec
+rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:0];
+```
+
+10. Add `UnityFramework` to your project scheme. Select you project scheme -> `Edit scheme...` -> `Build` -> Click `+` -> Select `UnityFramework` from list -> move `UnityFramework` before your app (drag and drop)
 
 #### Android
 
