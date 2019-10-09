@@ -1,4 +1,4 @@
-package com.reactlibrary;
+package com.wowmaking.rnunity;
 
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
