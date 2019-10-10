@@ -1,0 +1,9 @@
+{
+    "name": "Wowmaking.RNU.Editor",
+    "optionalUnityReferences": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

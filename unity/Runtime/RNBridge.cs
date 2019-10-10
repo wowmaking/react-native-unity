@@ -1,8 +1,5 @@
-
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using UnityEngine;
 
 using Newtonsoft.Json.Linq;
 
@@ -13,35 +10,34 @@ public class NativeAPI
     public static extern void sendMessage(string message);
 }
 
-class Result
-{
-    public string type;
-    public string name;
-    public object data;
-}
-
-class EventResult : Result
-{
-    public EventResult()
-    {
-        this.type = "event";
-    }
-}
-
-class CommandResult : Result
-{
-    public int id;
-    public bool resolved;
-
-    public CommandResult()
-    {
-        this.type = "result";
-    }
-}
-
-
 namespace Wowmaking.RNU
 {
+
+    class Result
+    {
+        public string type;
+        public string name;
+        public object data;
+    }
+
+    class EventResult : Result
+    {
+        public EventResult()
+        {
+            this.type = "event";
+        }
+    }
+
+    class CommandResult : Result
+    {
+        public int id;
+        public bool resolved;
+
+        public CommandResult()
+        {
+            this.type = "result";
+        }
+    }
 
     public interface IRNCommandsDelegate
     {
