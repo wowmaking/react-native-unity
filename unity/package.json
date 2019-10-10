@@ -1,6 +1,6 @@
 {
   "name": "com.wowmaking.react-native-unity",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "displayName": "react-native-unity",
   "description": "ReactNative <-> Unity Integration",
   "unity": "2019.3"
