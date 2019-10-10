@@ -124,7 +124,7 @@ namespace Wowmaking.RNU
         }
 
 
-        public static void SendEvent(String name, object data)
+        public static void SendEvent(String name, object data = null)
         {
             EventResult r = new EventResult();
             r.name = name;
