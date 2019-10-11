@@ -12,6 +12,11 @@ namespace Wowmaking.RNU
             RNBridge.SendCommandToReceiver(message);
         }
 
+        public void HandShake()
+        {
+            RNBridge.HandShake();
+        }
+
     }
 
 }
