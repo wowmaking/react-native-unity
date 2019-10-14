@@ -84,7 +84,11 @@ You ready to debug your app at simulator!
     - remove `UnityFramework.framework` from `Linked Frameworks and Libraries` ( select it and press `-` )
     - in `Build Phases` move `Embedded Binaries` before `Compile Sources` ( drag and drop )
     ![Example](https://forum.unity.com/attachments/image1-png.427024/)
-5. Add following lines to your project `main.m` file (located at same folder with `AppDelegate`)
+5. Expose `NativeCallProxy.h`. Native application implements NativeCallsProtocol defined in following file.
+    - find and select `Unity-iPhone/Libraries/com.wowmaking.react-native-unity/Plugins/iOS/NativeCallProxy.h`
+    - enable `UnityFramework` in `Target Membership` and set `Public` header visibility (small dropdown on right side to `UnityFramework`)
+![Example](https://forum.unity.com/attachments/image7-png.427027/)
+6. Add following lines to your project `main.m` file (located at same folder with `AppDelegate`)
 ```objectivec
 #import <UIKit/UIKit.h>
 +++ #import <RNUnity/RNUnity.h>
@@ -99,7 +103,7 @@ int main(int argc, char * argv[]) {
   }
 }
 ```
-6. Add following lines to your project `AppDelegate.m` file
+7. Add following lines to your project `AppDelegate.m` file
 ```objectivec
 #import "AppDelegate.h"
 
@@ -126,12 +130,12 @@ int main(int argc, char * argv[]) {
 @end
 ```
 
-7. In `AppDelegate.m` file make background color of React root view transparent
+8. In `AppDelegate.m` file make background color of React root view transparent
 ```objectivec
 rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:0];
 ```
 
-8. Add `UnityFramework` to your project scheme. Select you project scheme -> `Edit scheme...` -> `Build` -> Click `+` -> Select `UnityFramework` from list -> move `UnityFramework` before your app (drag and drop)
+9. Add `UnityFramework` to your project scheme. Select you project scheme -> `Edit scheme...` -> `Build` -> Click `+` -> Select `UnityFramework` from list -> move `UnityFramework` before your app (drag and drop)
 
 #### Android
 

@@ -1,7 +1,7 @@
 
 #import "RNUnity.h"
-#import "NativeCallProxy.h"
 #include <UnityFramework/UnityFramework.h>
+#include <UnityFramework/NativeCallProxy.h>
 
 
 UnityFramework* UnityFrameworkLoad()
