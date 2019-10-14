@@ -3,12 +3,13 @@ using System.Runtime.InteropServices;
 
 using Newtonsoft.Json.Linq;
 
-
+#if UNITY_IOS
 public class NativeAPI
 {
     [DllImport("__Internal")]
     public static extern void sendMessage(string message);
 }
+#endif
 
 namespace Wowmaking.RNU
 {
