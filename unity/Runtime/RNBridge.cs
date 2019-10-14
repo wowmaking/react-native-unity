@@ -39,6 +39,14 @@ namespace Wowmaking.RNU
         }
     }
 
+    class HandShake : Result
+    {
+        public HandShake()
+        {
+            this.type = "handshake";
+        }
+    }
+
     public interface IRNCommandsDelegate
     {
         void HandleCommand(string message);
@@ -119,6 +127,15 @@ namespace Wowmaking.RNU
             return c;
         }
 
+
+        public static void HandShake()
+        {
+            var r = new HandShake();
+
+            string message = JObject.FromObject(r).ToString();
+
+            RNBridge.SendMessage(message);
+        }
 
         public static void SendEvent(String name, object data = null)
         {

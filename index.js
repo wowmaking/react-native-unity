@@ -18,6 +18,12 @@ class UnityManager extends EventTarget {
 
   /**
    * @private
+   * @type {UnityCommand}
+   */
+  _handshake = null;
+
+  /**
+   * @private
    * @type {function}
    */
   _subscriber = null;
@@ -43,6 +49,31 @@ class UnityManager extends EventTarget {
     this.delegateName = delegateName;
     RNUnity.initialize();
     this._subscriber = RNUnityEventEmitter.addListener('UnityMessage', this._handleMessage.bind(this));
+
+    if (!this._handshake) {
+      this._handshake = new UnityCommand();
+
+      this._handshake.promise
+        .then((res) => {
+          this._handshake.resolved = true;
+          return res;
+        });
+
+      this.handshake();
+    }
+
+    return this._handshake.promise;
+  }
+
+  handshake = () => {
+    if (!this._handshake.resolved) {
+      this._invoke({
+        entityName: this.delegateName,
+        functionName: 'HandShake',
+      });
+
+      setTimeout(this.handshake, 100);
+    }
   }
 
   /**
@@ -91,6 +122,10 @@ class UnityManager extends EventTarget {
       const { type, name, data, } = messageData;
 
       switch (type) {
+
+        case 'handshake':
+          this._handshake.resolve();
+          break;
 
         case 'event':
           this.dispatchEvent({ type: name, data, });
