@@ -144,7 +144,7 @@ rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0
     defaultConfig {
         ...
         ndk {
-            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+            abiFilters "armeabi-v7a", "arm64-v8a"
         }
     }
     ```
