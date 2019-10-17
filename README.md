@@ -177,7 +177,7 @@ rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0
       android:name=".MainActivity"
       ...
       android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
-      android:hardwareAccelerated="false"
+      android:hardwareAccelerated="true"
       android:launchMode="singleTask"
     >
     ```

@@ -21,6 +21,8 @@ public class UnityReactActivity extends ReactActivity implements IUnityPlayerLif
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        getWindow().setFormat(android.graphics.PixelFormat.RGBA_8888);
+
         super.onCreate(savedInstanceState);
 
         instance = this;
@@ -33,7 +35,8 @@ public class UnityReactActivity extends ReactActivity implements IUnityPlayerLif
         getIntent().putExtra("unity", cmdLine);
 
         mUnityPlayer = new UnityPlayer(this, this);
-
+        // turn off hardwareAccelerated for unity view
+        mUnityPlayer.getView().setLayerType(View.LAYER_TYPE_NONE, null);
         rootLayout.addView(mUnityPlayer, 0);
         mUnityPlayer.requestFocus();
     }
