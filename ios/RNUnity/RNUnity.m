@@ -1,7 +1,7 @@
 
 #import "RNUnity.h"
 #include <UnityFramework/UnityFramework.h>
-#include <UnityFramework/NativeCallProxy.h>
+#include <RNUProxy/RNUProxy.h>
 
 
 UnityFramework* UnityFrameworkLoad()
@@ -70,7 +70,7 @@ RCT_EXPORT_METHOD(initialize)
 {
     initialized = YES;
     [[RNUnity ufw] registerFrameworkListener: self];
-    [NSClassFromString(@"FrameworkLibAPI") registerAPIforNativeCalls:self];
+    [NSClassFromString(@"RNUProxy") registerAPIforNativeCalls:self];
 }
 
 RCT_EXPORT_METHOD(invoke:(NSString *)entityName functionName:(NSString *)functionName message:(NSString *)message)
