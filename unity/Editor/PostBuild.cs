@@ -25,6 +25,8 @@ namespace Wowmaking.RNU.Editor
                 project.FindFileGuidByRealPath("Data")
             );
 
+            project.AddFrameworkToProject(targetId, "RNUProxy.framework", false);
+
             project.WriteToFile(projectPath);
         }
 

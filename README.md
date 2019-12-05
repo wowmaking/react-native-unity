@@ -75,19 +75,16 @@ You ready to debug your app at simulator!
 #### iOS
 
 1. Run `pod install`
-2. Build Unity app to `[project_root]/unity/builds/ios`
-3. Add `Unity-iPhone.xcodeproj` to your workspace: `Menu` -> `File` -> `Add Files to [workspace_name]...` -> `[project_root]/unity/builds/ios/Unity-iPhone.xcodeproj`
-4. Add `UnityFramework.framework` to `Embedded Binaries`: 
+2. Add `RNUProxy.xcodeproj` to your project Libraries: Context Menu of `Libraries` folder -> `Add Files to [project_name]...` -> `[project_root]/node_modules/@wowmaking/react-native-unity/ios/RNUProxy/RNUProxy.xcodeproj`
+3. Build Unity app to `[project_root]/unity/builds/ios`
+4. Add `Unity-iPhone.xcodeproj` to your workspace: `Menu` -> `File` -> `Add Files to [workspace_name]...` -> `[project_root]/unity/builds/ios/Unity-iPhone.xcodeproj`
+5. Add `UnityFramework.framework` to `Embedded Binaries`: 
     - select `your_app` target in workspace
     - in `General` / `Embedded Binaries` press `+`
     - select `Unity-iPhone/Products/UnityFramework.framework`
     - remove `UnityFramework.framework` from `Linked Frameworks and Libraries` ( select it and press `-` )
     - in `Build Phases` move `Embedded Binaries` before `Compile Sources` ( drag and drop )
     ![Example](https://forum.unity.com/attachments/image1-png.427024/)
-5. Expose `NativeCallProxy.h`. Native application implements NativeCallsProtocol defined in following file.
-    - find and select `Unity-iPhone/Libraries/com.wowmaking.react-native-unity/Plugins/iOS/NativeCallProxy.h`
-    - enable `UnityFramework` in `Target Membership` and set `Public` header visibility (small dropdown on right side to `UnityFramework`)
-![Example](https://forum.unity.com/attachments/image7-png.427027/)
 6. Add following lines to your project `main.m` file (located at same folder with `AppDelegate`)
 ```objectivec
 #import <UIKit/UIKit.h>

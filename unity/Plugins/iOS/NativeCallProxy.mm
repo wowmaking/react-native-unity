@@ -1,19 +1,6 @@
 #import <Foundation/Foundation.h>
-#import "NativeCallProxy.h"
-
-
-@implementation FrameworkLibAPI
-
-id<NativeCallsProtocol> api = NULL;
-+(void) registerAPIforNativeCalls:(id<NativeCallsProtocol>) aApi
-{
-    api = aApi;
-}
-
-@end
-
+#import "RNUProxy/RNUProxy.h"
 
 extern "C" {
-    void sendMessage(const char* message) { return [api sendMessage:[NSString stringWithUTF8String:message]]; }
+    void sendMessage(const char* message) { return [RNUProxy sendMessage:[NSString stringWithUTF8String:message]]; }
 }
-
