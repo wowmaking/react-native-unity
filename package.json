@@ -25,6 +25,7 @@
     "react-native": "^0.41.2"
   },
   "dependencies": {
-    "event-target-shim": "^5.0.1"
+    "event-target-shim": "^5.0.1",
+    "xml2js": "^0.4.22"
   }
 }
