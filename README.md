@@ -75,7 +75,7 @@ You ready to debug your app at simulator!
 #### iOS
 
 1. Run `pod install`
-2. Add `RNUProxy.xcodeproj` to your project Libraries: Context Menu of `Libraries` folder -> `Add Files to [project_name]...` -> `[project_root]/node_modules/@wowmaking/react-native-unity/ios/RNUProxy/RNUProxy.xcodeproj`
+2. Add `RNUProxy.xcodeproj` to your workspace: `Menu` -> `File` -> `Add Files to [workspace_name]...` -> `[project_root]/node_modules/@wowmaking/react-native-unity/ios/RNUProxy/RNUProxy.xcodeproj`
 3. Build Unity app to `[project_root]/unity/builds/ios`
 4. Add `Unity-iPhone.xcodeproj` to your workspace: `Menu` -> `File` -> `Add Files to [workspace_name]...` -> `[project_root]/unity/builds/ios/Unity-iPhone.xcodeproj`
 5. Add `UnityFramework.framework` to `Embedded Binaries`: 
@@ -132,7 +132,7 @@ int main(int argc, char * argv[]) {
 rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:0];
 ```
 
-9. Add `UnityFramework` to your project scheme. Select you project scheme -> `Edit scheme...` -> `Build` -> Click `+` -> Select `UnityFramework` from list -> move `UnityFramework` before your app (drag and drop)
+9. Add `RNUProxy` and `UnityFramework` to your project scheme. Select your project scheme -> `Edit scheme...` -> `Build` -> Click `+` -> Select `RNUProxy`/`UnityFramework` from list -> move `UnityFramework` before your app (drag and drop) and `RNUProxy` before `UnityFramework`
 
 #### Android
 
