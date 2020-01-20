@@ -6,6 +6,10 @@ namespace Wowmaking.RNU
 
     public class RNCommadsDelegate : MonoBehaviour, IRNCommandsDelegate
     {
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
 
         public void HandleCommand(string message)
         {
