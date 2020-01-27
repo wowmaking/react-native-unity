@@ -15,9 +15,7 @@
 
 -(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
 {
-    UIView *view = [[[RNUnity ufw] appController] rootView];
-    [view hitTest:point withEvent:event];
-    return view;
+    return [RNUnity.ufw.appController.window hitTest:point withEvent:event];
 }
 
 @end
