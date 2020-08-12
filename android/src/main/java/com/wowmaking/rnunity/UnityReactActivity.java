@@ -15,7 +15,11 @@ import com.unity3d.player.IUnityPlayerLifecycleEvents;
 import com.unity3d.player.UnityPlayer;
 
 public class UnityReactActivity extends ReactActivity implements IUnityPlayerLifecycleEvents {
-    public static UnityReactActivity instance = null;
+    private static UnityReactActivity instance = null;
+
+    public static UnityReactActivity getInstance() {
+        return instance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +62,44 @@ public class UnityReactActivity extends ReactActivity implements IUnityPlayerLif
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
-    public static void UnitySendMessage(String gameObj, String method, String arg) {
-        mUnityPlayer.UnitySendMessage(gameObj, method, arg);
+    public interface IUnityReceiver {
+        void receiveHandshake(String entityName);
+        void receiveCommand(String entityName, String message);
+    }
+
+    public IUnityReceiver unityReceiver;
+
+    protected void setReceiver(IUnityReceiver receiver) {
+        unityReceiver = receiver;
     }
 
     protected void sendMessage(String message) {
-        RNUnityModule.sendEvent("UnityMessage", message);
+        RNUnityModule.getInstance().sendEvent("UnityMessage", message);
+    }
+
+    public void unitySendHandshake(String entityName) {
+        if (unityReceiver != null) {
+            final String finalEntityName = entityName;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    unityReceiver.receiveHandshake(finalEntityName);
+                }
+            });
+        }
+    }
+
+    public void unitySendCommand(String entityName, String arg) {
+        if (unityReceiver != null) {
+            final String finalEntityName = entityName;
+            final String finalArg = arg;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    unityReceiver.receiveCommand(finalEntityName, finalArg);
+                }
+            });
+        }
     }
 
     protected FrameLayout getUnityFrameLayout() {

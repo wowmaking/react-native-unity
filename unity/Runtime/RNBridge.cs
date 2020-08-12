@@ -1,57 +1,47 @@
-using System;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 using UnityEngine;
 
 using Newtonsoft.Json.Linq;
 
-#if UNITY_IOS
-public class NativeAPI
-{
-    [DllImport("__Internal")]
-    public static extern void sendMessage(string message);
-}
-#endif
-
 namespace Wowmaking.RNU
 {
-
-    class Result
+    public class RNMessage
     {
-        public string type;
-        public string name;
-        public object data;
-    }
+        public readonly string type;
+        public readonly string name;
+        public readonly object data;
 
-    class EventResult : Result
-    {
-        public EventResult()
+        public RNMessage(string type, string name, object data) 
         {
-            this.type = "event";
+            this.type = type;
+            this.name = name;
+            this.data = data ?? new JObject();
         }
-    }
 
-    class CommandResult : Result
-    {
-        public int id;
-        public bool resolved;
-
-        public CommandResult()
+        public string ToJsonString()
         {
-            this.type = "result";
-        }
+            var jobject = JObject.FromObject(this);
+            return jobject.ToString();
+        } 
     }
 
-    class HandShake : Result
+    public class RNMessageEvent : RNMessage
     {
-        public HandShake()
-        {
-            this.type = "handshake";
-        }
+        public RNMessageEvent(string name, object data) 
+        : base("event", name, data) {}
     }
 
-    public interface IRNCommandsDelegate
+    public class RNMessageResult : RNMessage
     {
-        void HandleCommand(string message);
+        public RNMessageResult(string name, object data)
+        : base("result", name, data) {}
+    }
+
+    public class RNMessageHandshake : RNMessage
+    {
+        public RNMessageHandshake() 
+        : base("handshake", string.Empty, null) {}
     }
 
     public interface IRNCommandsReceiver
@@ -61,128 +51,277 @@ namespace Wowmaking.RNU
 
     public class RNCommand
     {
+        public readonly int id;
+        public readonly string name;
+        public readonly JObject data;
 
-        public int id;
-        public string name;
-        public JObject data;
-        public bool resolved;
-
+        private bool resolved;
         private bool completed = false;
 
-        public virtual void Resolve(object resultData = null)
+        public RNCommand(string message) 
+        : this(JObject.Parse(message)) {}
+
+        public RNCommand(JObject obj) 
+        : this(obj.Value<int>(nameof(id)), 
+            obj.Value<string>(nameof(name)), 
+            obj.Value<JObject>(nameof(data))) {}
+        
+        public RNCommand(int id, string name, JObject data)
         {
-            this.resolved = true;
-            this.SendResult(resultData);
+            this.id = id;
+            this.name = name;
+            this.data = data;
+        }
+        
+        public void Resolve(object resultData = null)
+        {
+            resolved = true;
+            SendResult(resultData);
         }
 
-        public virtual void Reject(object resultData = null)
+        public void Reject(object resultData = null)
         {
-            this.resolved = false;
-            this.SendResult(resultData);
+            resolved = false;
+            SendResult(resultData);
         }
 
         private void SendResult(object resultData = null)
         {
-            if (!this.completed)
+            if (!completed)
             {
-                this.completed = true;
-                if (resultData == null)
-                {
-                    resultData = new { };
-                }
+                completed = true;
+                RNCommandResult data = new RNCommandResult(id, resolved, resultData);
+                RNMessageResult result = new RNMessageResult(name, data);
+                RNBridge.SendResult(result);
+            }
+        }
 
-                RNBridge.SendResult(id, name, resolved, resultData);
+        class RNCommandResult 
+        {
+            public readonly int id;
+            public readonly bool resolved;
+            public readonly object result;
+
+            public RNCommandResult(int id, bool resolved, object resultData) 
+            {
+                this.id = id;
+                this.resolved = resolved;
+                this.result = resultData ?? new JObject();
             }
         }
     }
-
+    
     public static class RNBridge
-    {
-
-        private static IRNCommandsReceiver commandsReceiver = null;
-
+    {        
+        // Public
         public static void SetCommandsReceiver(IRNCommandsReceiver cReceiver)
         {
-            RNBridge.commandsReceiver = cReceiver;
+            SetReceiver(cReceiver);
         }
 
-        public static void SendCommandToReceiver(string message)
+        public static bool IsAvailable() 
         {
-            if (RNBridge.commandsReceiver == null)
+            return unityReact?.IsAvailable() ?? false;
+        }
+
+        public static void SendEvent(string name, object data = null) => SendMessage(new RNMessageEvent(name, data));
+
+        public static void SendEvent(RNMessageEvent messageEvent) => SendMessage(messageEvent.ToJsonString());
+
+        public static void SendResult(RNMessageResult messageResult) => SendMessage(messageResult.ToJsonString());
+
+        public static void SendHandshake(RNMessageHandshake messageHandshake) => SendMessage(messageHandshake.ToJsonString());
+
+        public static void SendMessage(RNMessage message) => SendMessage(message.ToJsonString());
+
+        // Private
+        private static IRNCommandsReceiver commandsReceiver;
+
+        private static IUnityReact unityReact;
+        
+        private static System.Threading.Tasks.TaskScheduler unityScheduler;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Initialize()
+        {
+            unityScheduler = System.Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext();
+
+            if (!Application.isEditor) 
             {
-                return;
+                if (Debug.isDebugBuild) 
+                {
+                    Debug.Log($"{nameof(RNBridge)}: try initialize");
+                }
+                try
+                {
+                    if (Application.platform == RuntimePlatform.Android) 
+                    {
+                        unityReact = new AndroidUnityReact();
+                    }
+                    else
+                    {
+                        unityReact = new NativeUnityReact();
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"{nameof(RNBridge)}: exception during try initialize <{e.Message}>");
+                }
             }
-
-            RNBridge.commandsReceiver.HandleCommand(RNBridge.CreateCommand(message));
         }
-
-
-        public static RNCommand CreateCommand(string message)
+        private static void SetReceiver(IRNCommandsReceiver receiver)
         {
-            var c = new RNCommand();
-            var o = JObject.Parse(message);
-
-            c.id = (int)o["id"];
-            c.name = (string)o["name"];
-            c.data = (JObject)o["data"];
-
-            return c;
-        }
-
-
-        public static void HandShake()
-        {
-            var r = new HandShake();
-
-            string message = JObject.FromObject(r).ToString();
-
-            RNBridge.SendMessage(message);
-        }
-
-        public static void SendEvent(String name, object data = null)
-        {
-            EventResult r = new EventResult();
-            r.name = name;
-            r.data = data;
-
-            string message = JObject.FromObject(r).ToString();
-
-            RNBridge.SendMessage(message);
-        }
-
-        public static void SendResult(int id, String name, bool resolved, object data)
-        {
-            CommandResult r = new CommandResult();
-            r.id = id;
-            r.name = name;
-            r.resolved = resolved;
-            r.data = data;
-
-            string message = JObject.FromObject(r).ToString();
-
-            RNBridge.SendMessage(message);
-        }
-
-        public static void SendMessage(String message)
-        {
-#if !UNITY_EDITOR
-    #if UNITY_ANDROID
+            commandsReceiver = receiver;
+            
+            if (Debug.isDebugBuild) 
+            {
+                Debug.Log($"{nameof(RNBridge)}: try set receiver");
+            }
             try
             {
+                unityReact?.SetReceiver(ReceiveHandshake, ReceiveCommand);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"{nameof(RNBridge)}: exception during try set receiver <{e.Message}>");
+            }
+        }
+
+        private static void SendMessage(string message)
+        {
+            if (Debug.isDebugBuild)
+            {
+                Debug.Log($"{nameof(RNBridge)}: try send message <{message}>");
+            }
+            try 
+            {
+                unityReact?.SendMessage(message);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"{nameof(RNBridge)}: exception during send message <{e.Message}>");
+            }
+        }
+        
+        [AOT.MonoPInvokeCallback(typeof(System.Action<string>))]
+        private static void ReceiveHandshake(string entityName) 
+        {
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+                {
+                    if (commandsReceiver != null) 
+                    {
+                        if (Debug.isDebugBuild) 
+                        {
+                            Debug.Log($"{nameof(RNBridge)}: receive for <{entityName}> handshake");
+                        }
+                        RNBridge.SendHandshake(new RNMessageHandshake());
+                    }
+                }, 
+                System.Threading.CancellationToken.None,
+                System.Threading.Tasks.TaskCreationOptions.None, 
+                unityScheduler);
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(System.Action<string, string>))]
+        private static void ReceiveCommand(string entityName, string message) 
+        {
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+                {
+                    if (commandsReceiver != null)
+                    {
+                        if (Debug.isDebugBuild) 
+                        {
+                            Debug.Log($"{nameof(RNBridge)}: receive for <{entityName}> command <{message}>");
+                        }            
+                        commandsReceiver.HandleCommand(new RNCommand(message));
+                    }
+                }, 
+                System.Threading.CancellationToken.None,
+                System.Threading.Tasks.TaskCreationOptions.None, 
+                unityScheduler);
+        }
+
+        interface IUnityReact 
+        {
+            bool IsAvailable();
+            void SetReceiver(System.Action<string> handshake, System.Action<string, string> command);
+            void SendMessage(string message);
+        }
+
+        class NativeUnityReact : IUnityReact 
+        {
+            bool IUnityReact.IsAvailable()
+            {
+                return RNUProxyIsAvailable();
+            }
+
+            void IUnityReact.SetReceiver(System.Action<string> handshake, System.Action<string, string> command)
+            {
+                RNUProxySetReceiver(handshake, command);
+            }
+
+            void IUnityReact.SendMessage(string message) 
+            {
+                RNUProxySendMessage(message);
+            }
+
+            [DllImport("__Internal")]
+            public static extern bool RNUProxyIsAvailable();
+            [DllImport("__Internal")]
+            public static extern void RNUProxySetReceiver(System.Action<string> handshake, System.Action<string, string> command);
+            [DllImport("__Internal")]
+            public static extern void RNUProxySendMessage(string message);
+        }
+
+        class AndroidUnityReact : IUnityReact 
+        {
+            private readonly AndroidJavaObject unityReactActivity;
+
+            public AndroidUnityReact()
+            {
                 AndroidJavaClass jc = new AndroidJavaClass("com.wowmaking.rnunity.UnityReactActivity");
-                AndroidJavaObject unityReactActivity = jc.GetStatic<AndroidJavaObject>("instance");
+                unityReactActivity = jc.CallStatic<AndroidJavaObject>("getInstance");
+            }
+
+            bool IUnityReact.IsAvailable()
+            {
+                return unityReactActivity != null;
+            }
+
+            void IUnityReact.SetReceiver(System.Action<string> handshake, System.Action<string, string> command) 
+            {
+                unityReactActivity.Call("setReceiver", new AndroidReceiver(handshake, command));
+            }
+
+            void IUnityReact.SendMessage(string message) 
+            {
                 unityReactActivity.Call("sendMessage", message);
             }
-            catch (Exception e)
-            {
-                Debug.Log("Exception during sendMessage to UnityReactActivity");
-                Debug.Log(e.Message);
-            }
-    #elif UNITY_IOS
-            NativeAPI.sendMessage(message);
-    #endif
-#endif
-		}
 
-	}
+            private class AndroidReceiver : AndroidJavaProxy 
+            {
+                private readonly System.Action<string> proxyHandshake;
+                private readonly System.Action<string, string> proxyCommand;
+
+                public AndroidReceiver(System.Action<string> handshake, System.Action<string, string> command) 
+                    : base("com.wowmaking.rnunity.UnityReactActivity$IUnityReceiver")
+                {
+                    proxyHandshake = handshake;
+                    proxyCommand = command;
+                }
+
+                [UnityEngine.Scripting.Preserve]
+                void receiveHandshake(string entityName)
+                {
+                    proxyHandshake(entityName);
+                }
+
+                [UnityEngine.Scripting.Preserve]
+                void receiveCommand(string entityName, string arg) 
+                {
+                    proxyCommand(entityName, arg);
+                }
+            }
+        }
+    }
 }

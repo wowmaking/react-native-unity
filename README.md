@@ -18,9 +18,7 @@
         "com.wowmaking.react-native-unity": "file:../../node_modules/@wowmaking/react-native-unity/unity"
     }
     ```
-2. Right-click at you `Hierarchy` menu, then click `Create Empty`, rename new game object (example: `UICommandsDelegate`). **IMPORTANT! Remember the name of new game object, that needed to initialize JavaScript lib.**
-3. Add script `RNCommadsDelegate.cs` to new game object (step 2) (location: `Packages/react-native-unity/Runtime/Scripts`)
-4. To receive commands from JavaScript, you must create another game object, or use existing. Commands receiver object must implements `IRNCommandsReceiver` interface
+2. To receive commands from JavaScript, you must create another game object, or use existing. Commands receiver object must implements `IRNCommandsReceiver` interface
     ```c
     using Wowmaking.RNU;
     
@@ -29,7 +27,7 @@
     ...
     }
     ```
-5. Set your object as commands receiver to `RNBridge` on `Awake`
+3. Set your object as commands receiver to `RNBridge` on `Awake`
     ```c
     using Wowmaking.RNU;
     
@@ -41,7 +39,7 @@
         }
     }
     ```
-6. Implement `IRNCommandsReceiver` interface by adding `HandleCommand` method
+4. Implement `IRNCommandsReceiver` interface by adding `HandleCommand` method
     ```c
     using Wowmaking.RNU;
     
@@ -68,6 +66,7 @@ If you want to test your app at xcode simulator, you need following next steps:
 1. Go to `Menu` -> `Edit` -> `Project setings...` -> `Player` -> `iOS` -> `Other Settings`
 2. Remove check from `Auto Graphics API`
 3. Add `OpenGLES3` to `Graphics APIs` list by clicking `+`
+4. Remove `Metal` from `Graphics APIs` list by clicking `-`
 4. Find `Target SDK` setting and select `Simulator SDK`
 
 You ready to debug your app at simulator!
@@ -75,17 +74,17 @@ You ready to debug your app at simulator!
 #### iOS
 
 1. Run `pod install`
-2. Add `RNUProxy.xcodeproj` to your workspace: `Menu` -> `File` -> `Add Files to [workspace_name]...` -> `[project_root]/node_modules/@wowmaking/react-native-unity/ios/RNUProxy/RNUProxy.xcodeproj`
-3. Build Unity app to `[project_root]/unity/builds/ios`
-4. Add `Unity-iPhone.xcodeproj` to your workspace: `Menu` -> `File` -> `Add Files to [workspace_name]...` -> `[project_root]/unity/builds/ios/Unity-iPhone.xcodeproj`
-5. Add `UnityFramework.framework` to `Embedded Binaries`: 
+2. Build Unity app to `[project_root]/unity/builds/ios`
+3. Add `Unity-iPhone.xcodeproj` to your workspace: `Menu` -> `File` -> `Add Files to [workspace_name]...` -> `[project_root]/unity/builds/ios/Unity-iPhone.xcodeproj`
+4. Add `UnityFramework.framework` to `Embedded Binaries`: 
     - select `your_app` target in workspace
     - in `General` / `Embedded Binaries` press `+`
     - select `Unity-iPhone/Products/UnityFramework.framework`
     - remove `UnityFramework.framework` from `Linked Frameworks and Libraries` ( select it and press `-` )
     - in `Build Phases` move `Embedded Binaries` before `Compile Sources` ( drag and drop )
     ![Example](https://forum.unity.com/attachments/image1-png.427024/)
-6. Add following lines to your project `main.m` file (located at same folder with `AppDelegate`)
+5.
+Add following lines to your project `main.m` file (located at same folder with `AppDelegate`)
 ```objectivec
 #import <UIKit/UIKit.h>
 +++ #import <RNUnity/RNUnity.h>
@@ -100,7 +99,8 @@ int main(int argc, char * argv[]) {
   }
 }
 ```
-7. Add following lines to your project `AppDelegate.m` file
+
+Add following lines to your project `AppDelegate.m` file
 ```objectivec
 #import "AppDelegate.h"
 
@@ -127,12 +127,10 @@ int main(int argc, char * argv[]) {
 @end
 ```
 
-8. In `AppDelegate.m` file make background color of React root view transparent
+6. In `AppDelegate.m` file make background color of React root view transparent
 ```objectivec
 rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:0];
 ```
-
-9. Add `RNUProxy` and `UnityFramework` to your project scheme. Select your project scheme -> `Edit scheme...` -> `Build` -> Click `+` -> Select `RNUProxy`/`UnityFramework` from list -> move `UnityFramework` before your app (drag and drop) and `RNUProxy` before `UnityFramework`
 
 #### Android
 
@@ -237,7 +235,7 @@ const App = () => {
         
     Usage:
     ```javascript
-    Unity.addEventListener('event_type', listener });
+    Unity.addEventListener('event_type', { listener });
     ```
     
 ##### **`UnityResponderView`** - React-component, that provide all touch events to Unity
@@ -254,7 +252,7 @@ const App = () => {
 ##### **`RNCommand`** - class of reciving JavaScript commands
 ###### Properties
 1. `name` (`string`) - name of received command
-2. `data` ('object') - data of received command
+2. `data` (`object`) - data of received command
 ###### Methods
 1. `Resolve` - invoke on successful command execution
     Params:

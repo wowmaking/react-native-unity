@@ -10,8 +10,6 @@ import { EventTarget, } from 'event-target-shim';
 const { RNUnity, } = NativeModules;
 const RNUnityEventEmitter = new NativeEventEmitter(RNUnity);
 
-const COMMANDS_DELEGATE_FN_NAME = 'HandleCommand';
-
 let commandsIdIterator = 0;
 
 class UnityManager extends EventTarget {
@@ -67,12 +65,11 @@ class UnityManager extends EventTarget {
 
   handshake = () => {
     if (!this._handshake.resolved) {
-      this._invoke({
+      this._invokeHandshake({
         entityName: this.delegateName,
-        functionName: 'HandShake',
       });
 
-      setTimeout(this.handshake, 100);
+      setTimeout(this.handshake, 300);
     }
   }
 
@@ -89,9 +86,8 @@ class UnityManager extends EventTarget {
     const command = new UnityCommand(id, name, data);
     this._commandsMap[id] = command;
 
-    this._invoke({
+    this._invokeCommand({
       entityName: this.delegateName,
-      functionName: COMMANDS_DELEGATE_FN_NAME,
       message: command.getMessage(),
     });
 
@@ -100,15 +96,29 @@ class UnityManager extends EventTarget {
 
   /**
    * 
-   * Invoke entity method
+   * invoke handshake method
    * @private
    * @param {Object} options
    * @param {string} options.entityName Unity entity name
-   * @param {string} options.functionName Unity entity script component function
    * @param {string=} options.message Unity entity script component function param
    */
-  _invoke({ entityName, functionName, message = '', }) {
-    RNUnity.invoke(entityName, functionName, message);
+  _invokeHandshake({ entityName, }) {
+                console.warn("send handshake");
+    RNUnity.invokeHandshake(entityName);
+  }
+
+  /**
+   * 
+   * invoke entity method
+   * @private
+   * @param {Object} options
+   * @param {string} options.entityName Unity entity name
+   * @param {string=} options.message Unity entity script component function param
+   */
+  _invokeCommand({ entityName, message = '', }) {
+                console.warn("send command");
+                console.warn(message);
+    RNUnity.invokeCommand(entityName, message);
   }
 
   /**
@@ -118,29 +128,38 @@ class UnityManager extends EventTarget {
    */
   _handleMessage(message) {
     try {
+      console.warn("recieve");
+      console.warn(message);
+      // console.warn("recieve2");
       const messageData = JSON.parse(message);
       const { type, name, data, } = messageData;
 
       switch (type) {
 
         case 'handshake':
+      console.warn("recieve1");
           this._handshake.resolve();
+      // console.warn("recieve4");
           break;
 
         case 'event':
+      console.warn("recieve2");
           this.dispatchEvent({ type: name, data, });
           break;
 
         case 'result':
-          const { id, resolved, } = messageData;
+      console.warn("recieve3");
+          const { id, resolved, result } = data;
           if (this._commandsMap[id]) {
             const command = this._commandsMap[id];
 
             if (resolved) {
-              command.resolve(data);
+      console.warn("recieve31");
+              command.resolve(result);
             }
             else {
-              command.reject(data);
+      console.warn("recieve32");
+              command.reject(result);
             }
 
             delete this._commandsMap[id];
