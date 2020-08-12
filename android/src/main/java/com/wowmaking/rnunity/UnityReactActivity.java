@@ -106,6 +106,8 @@ public class UnityReactActivity extends ReactActivity implements IUnityPlayerLif
         return mUnityPlayer;
     }
 
+    // Unity 2020.1
+
     public static UnityPlayer mUnityPlayer; // don't change the name of this variable; referenced from native code
 
     // Override this in your custom UnityPlayerActivity to tweak the command line arguments passed to the Unity Android Player
@@ -120,19 +122,16 @@ public class UnityReactActivity extends ReactActivity implements IUnityPlayerLif
     }
 
     // When Unity player unloaded move task to background
-    @Override
-    public void onUnityPlayerUnloaded() {
+    @Override public void onUnityPlayerUnloaded() {
         moveTaskToBack(true);
     }
 
-    // When Unity player quited kill process
-    @Override
-    public void onUnityPlayerQuitted() {
-        Process.killProcess(Process.myPid());
+    // Callback before Unity player process is killed
+    @Override public void onUnityPlayerQuitted() {
     }
 
-    @Override
-    public void onNewIntent(Intent intent) {
+    @Override protected void onNewIntent(Intent intent)
+    {
         // To support deep linking, we need to make sure that the client can get access to
         // the last sent intent. The clients access this through a JNI api that allows them
         // to get the intent set on launch. To update that after launch we have to manually
@@ -142,84 +141,69 @@ public class UnityReactActivity extends ReactActivity implements IUnityPlayerLif
     }
 
     // Quit Unity
-    @Override
-    protected void onDestroy() {
+    @Override protected void onDestroy ()
+    {
         mUnityPlayer.destroy();
         super.onDestroy();
-        instance = null;
     }
 
     // Pause Unity
-    @Override
-    protected void onPause() {
+    @Override protected void onPause()
+    {
         super.onPause();
         mUnityPlayer.pause();
     }
 
     // Resume Unity
-    @Override
-    protected void onResume() {
+    @Override protected void onResume()
+    {
         super.onResume();
         mUnityPlayer.resume();
     }
 
     // Low Memory Unity
-    @Override
-    public void onLowMemory() {
+    @Override public void onLowMemory()
+    {
         super.onLowMemory();
         mUnityPlayer.lowMemory();
     }
 
     // Trim Memory Unity
-    @Override
-    public void onTrimMemory(int level) {
+    @Override public void onTrimMemory(int level)
+    {
         super.onTrimMemory(level);
-        if (level == TRIM_MEMORY_RUNNING_CRITICAL) {
+        if (level == TRIM_MEMORY_RUNNING_CRITICAL)
+        {
             mUnityPlayer.lowMemory();
         }
     }
 
     // This ensures the layout will be correct.
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    @Override public void onConfigurationChanged(Configuration newConfig)
+    {
         super.onConfigurationChanged(newConfig);
         mUnityPlayer.configurationChanged(newConfig);
     }
 
     // Notify Unity of the focus change.
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
+    @Override public void onWindowFocusChanged(boolean hasFocus)
+    {
         super.onWindowFocusChanged(hasFocus);
         mUnityPlayer.windowFocusChanged(hasFocus);
     }
 
     // For some reason the multiple keyevent type is not supported by the ndk.
     // Force event injection by overriding dispatchKeyEvent().
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
+    @Override public boolean dispatchKeyEvent(KeyEvent event)
+    {
         if (event.getAction() == KeyEvent.ACTION_MULTIPLE)
             return mUnityPlayer.injectEvent(event);
         return super.dispatchKeyEvent(event);
     }
 
     // Pass any events not handled by (unfocused) views straight to UnityPlayer
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        return mUnityPlayer.injectEvent(event);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return mUnityPlayer.injectEvent(event);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return mUnityPlayer.injectEvent(event);
-    }
-
-    /*API12*/
-    public boolean onGenericMotionEvent(MotionEvent event) {
-        return mUnityPlayer.injectEvent(event);
-    }
+    @Override public boolean onKeyUp(int keyCode, KeyEvent event)     { return mUnityPlayer.injectEvent(event); }
+    @Override public boolean onKeyDown(int keyCode, KeyEvent event)   { return mUnityPlayer.injectEvent(event); }
+    @Override public boolean onTouchEvent(MotionEvent event)          { return mUnityPlayer.injectEvent(event); }
+    /*API12*/ public boolean onGenericMotionEvent(MotionEvent event)  { return mUnityPlayer.injectEvent(event); }
 }

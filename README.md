@@ -64,10 +64,7 @@
 ##### iOS simulator settings
 If you want to test your app at xcode simulator, you need following next steps:
 1. Go to `Menu` -> `Edit` -> `Project setings...` -> `Player` -> `iOS` -> `Other Settings`
-2. Remove check from `Auto Graphics API`
-3. Add `OpenGLES3` to `Graphics APIs` list by clicking `+`
-4. Remove `Metal` from `Graphics APIs` list by clicking `-`
-4. Find `Target SDK` setting and select `Simulator SDK`
+2. Find `Target SDK` setting and select `Simulator SDK`
 
 You ready to debug your app at simulator!
 

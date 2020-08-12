@@ -103,7 +103,6 @@ class UnityManager extends EventTarget {
    * @param {string=} options.message Unity entity script component function param
    */
   _invokeHandshake({ entityName, }) {
-                console.warn("send handshake");
     RNUnity.invokeHandshake(entityName);
   }
 
@@ -116,8 +115,6 @@ class UnityManager extends EventTarget {
    * @param {string=} options.message Unity entity script component function param
    */
   _invokeCommand({ entityName, message = '', }) {
-                console.warn("send command");
-                console.warn(message);
     RNUnity.invokeCommand(entityName, message);
   }
 
@@ -128,37 +125,28 @@ class UnityManager extends EventTarget {
    */
   _handleMessage(message) {
     try {
-      console.warn("recieve");
-      console.warn(message);
-      // console.warn("recieve2");
       const messageData = JSON.parse(message);
       const { type, name, data, } = messageData;
 
       switch (type) {
 
         case 'handshake':
-      console.warn("recieve1");
           this._handshake.resolve();
-      // console.warn("recieve4");
           break;
 
         case 'event':
-      console.warn("recieve2");
           this.dispatchEvent({ type: name, data, });
           break;
 
         case 'result':
-      console.warn("recieve3");
           const { id, resolved, result } = data;
           if (this._commandsMap[id]) {
             const command = this._commandsMap[id];
 
             if (resolved) {
-      console.warn("recieve31");
               command.resolve(result);
             }
             else {
-      console.warn("recieve32");
               command.reject(result);
             }
 
