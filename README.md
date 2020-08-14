@@ -180,8 +180,7 @@ rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0
 ```javascript
 import { Unity, UnityResponderView } from '@wowmaking/react-native-unity';
 
-// Don't forget to initialize with name of GameObject, that you create at `Unity`->`Step 2`
-Unity.init('UICommandsDelegate');
+Unity.init();
 
 const App = () => {
   return (
@@ -199,12 +198,10 @@ const App = () => {
 ##### **`Unity`** - main module object
 ###### Methods:
 1. `init` - initialize `react-native-unity` lib
-    Params: 
-    - `delegateName` (`string`) - name of Unity GameObject, that was created at `Unity`->`Step 2`
     
     Usage:
     ```javascript
-    Unity.init('UICommandsDelegate');
+    Unity.init(;
     ```
 2. `execCommand` - send command to Unity
     Params: 
