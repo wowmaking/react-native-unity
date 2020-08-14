@@ -33,18 +33,11 @@ class UnityManager extends EventTarget {
   _commandsMap = {};
 
   /**
-   * Unity commands delegate name
-   * @type {string}
-   */
-  delegateName = null;
-
-  /**
    * 
    * Initialize unity
-   * @param {string} delegateName name of GameObj, that implements IRNCommandsDelegate interface at unity
+   * 
    */
-  init(delegateName = '') {
-    this.delegateName = delegateName;
+  init() {
     RNUnity.initialize();
     this._subscriber = RNUnityEventEmitter.addListener('UnityMessage', this._handleMessage.bind(this));
 
@@ -65,9 +58,7 @@ class UnityManager extends EventTarget {
 
   handshake = () => {
     if (!this._handshake.resolved) {
-      this._invokeHandshake({
-        entityName: this.delegateName,
-      });
+      this._invokeHandshake();
 
       setTimeout(this.handshake, 300);
     }
@@ -87,7 +78,6 @@ class UnityManager extends EventTarget {
     this._commandsMap[id] = command;
 
     this._invokeCommand({
-      entityName: this.delegateName,
       message: command.getMessage(),
     });
 
@@ -97,25 +87,20 @@ class UnityManager extends EventTarget {
   /**
    * 
    * invoke handshake method
-   * @private
-   * @param {Object} options
-   * @param {string} options.entityName Unity entity name
-   * @param {string=} options.message Unity entity script component function param
+   * 
    */
-  _invokeHandshake({ entityName, }) {
-    RNUnity.invokeHandshake(entityName);
+  _invokeHandshake() {
+    RNUnity.invokeHandshake();
   }
 
   /**
    * 
    * invoke entity method
    * @private
-   * @param {Object} options
-   * @param {string} options.entityName Unity entity name
    * @param {string=} options.message Unity entity script component function param
    */
-  _invokeCommand({ entityName, message = '', }) {
-    RNUnity.invokeCommand(entityName, message);
+  _invokeCommand({ message = '', }) {
+    RNUnity.invokeCommand(message);
   }
 
   /**

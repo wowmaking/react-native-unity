@@ -63,8 +63,8 @@ public class UnityReactActivity extends ReactActivity implements IUnityPlayerLif
     }
 
     public interface IUnityReceiver {
-        void receiveHandshake(String entityName);
-        void receiveCommand(String entityName, String message);
+        void receiveHandshake();
+        void receiveCommand(String message);
     }
 
     public IUnityReceiver unityReceiver;
@@ -77,26 +77,24 @@ public class UnityReactActivity extends ReactActivity implements IUnityPlayerLif
         RNUnityModule.getInstance().sendEvent("UnityMessage", message);
     }
 
-    public void unitySendHandshake(String entityName) {
+    public void unitySendHandshake() {
         if (unityReceiver != null) {
-            final String finalEntityName = entityName;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    unityReceiver.receiveHandshake(finalEntityName);
+                    unityReceiver.receiveHandshake();
                 }
             });
         }
     }
 
-    public void unitySendCommand(String entityName, String arg) {
+    public void unitySendCommand(String arg) {
         if (unityReceiver != null) {
-            final String finalEntityName = entityName;
             final String finalArg = arg;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    unityReceiver.receiveCommand(finalEntityName, finalArg);
+                    unityReceiver.receiveCommand(finalArg);
                 }
             });
         }

@@ -34,13 +34,13 @@ public class RNUnityModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void invokeHandshake(String entityName) {
-        UnityReactActivity.getInstance().unitySendHandshake(entityName);
+    public void invokeHandshake() {
+        UnityReactActivity.getInstance().unitySendHandshake();
     }
 
     @ReactMethod
-    public void invokeCommand(String entityName, String message) {
-        UnityReactActivity.getInstance().unitySendCommand(entityName, message);
+    public void invokeCommand(String message) {
+        UnityReactActivity.getInstance().unitySendCommand(message);
     }
 
     public void sendEvent(String eventName, @Nullable String params) {

@@ -8,8 +8,8 @@
 #endif
 
 
-typedef void (*proxy_receiver_handshake)(const char *);
-typedef void (*proxy_receiver_command)(const char *, const char *);
+typedef void (*proxy_receiver_handshake)();
+typedef void (*proxy_receiver_command)(const char *);
 
 RN_UNITY_EXTERN bool RNUProxyIsAvailable();
 RN_UNITY_EXTERN void RNUProxySetReceiver(proxy_receiver_handshake, proxy_receiver_command);

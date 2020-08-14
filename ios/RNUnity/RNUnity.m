@@ -108,18 +108,18 @@ static unity_receive_command _RNUnity_receiver_command;
     _RNUnity_receiver_command = receiverCommand;
 }
 
-RCT_EXPORT_METHOD(invokeHandshake:(NSString *)entityName) {
+RCT_EXPORT_METHOD(invokeHandshake) {
     if (_RNUnity_sharedInstance) {
         if (_RNUnity_receiver_handshake) {
-            _RNUnity_receiver_handshake([self toSharpString:entityName]);
+            _RNUnity_receiver_handshake();
         }
     }
 }
 
-RCT_EXPORT_METHOD(invokeCommand:(NSString *)entityName message:(NSString *)message) {
+RCT_EXPORT_METHOD(invokeCommand:(NSString *)message) {
     if (_RNUnity_sharedInstance) {
         if (_RNUnity_receiver_command) {
-            _RNUnity_receiver_command([self toSharpString:entityName], [self toSharpString:message]);
+            _RNUnity_receiver_command([self toSharpString:message]);
         }
     }
 }

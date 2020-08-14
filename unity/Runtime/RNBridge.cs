@@ -114,9 +114,9 @@ namespace Wowmaking.RNU
     public static class RNBridge
     {        
         // Public
-        public static void SetCommandsReceiver(IRNCommandsReceiver cReceiver)
+        public static void RegisterCommandsReceiver(IRNCommandsReceiver cReceiver)
         {
-            SetReceiver(cReceiver);
+            RegisterReceiver(cReceiver);
         }
 
         public static bool IsAvailable() 
@@ -135,7 +135,7 @@ namespace Wowmaking.RNU
         public static void SendMessage(RNMessage message) => SendMessage(message.ToJsonString());
 
         // Private
-        private static IRNCommandsReceiver commandsReceiver;
+        private static System.Action<RNCommand> commandsReceivers;
 
         private static IUnityReact unityReact;
         
@@ -169,14 +169,23 @@ namespace Wowmaking.RNU
                 }
             }
         }
-        private static void SetReceiver(IRNCommandsReceiver receiver)
+
+        private static void RegisterReceiver(IRNCommandsReceiver receiver)
         {
-            commandsReceiver = receiver;
-            
+            bool exist = commandsReceivers != null;
+            commandsReceivers += receiver.HandleCommand;            
+            if (!exist) 
+            {
+                SentReceiver();
+            }   
+        }
+
+        private static void SentReceiver()
+        {
             if (Debug.isDebugBuild) 
             {
                 Debug.Log($"{nameof(RNBridge)}: try set receiver");
-            }
+            }            
             try
             {
                 unityReact?.SetReceiver(ReceiveHandshake, ReceiveCommand);
@@ -203,16 +212,16 @@ namespace Wowmaking.RNU
             }
         }
         
-        [AOT.MonoPInvokeCallback(typeof(System.Action<string>))]
-        private static void ReceiveHandshake(string entityName) 
+        [AOT.MonoPInvokeCallback(typeof(System.Action))]
+        private static void ReceiveHandshake() 
         {
             System.Threading.Tasks.Task.Factory.StartNew(() =>
                 {
-                    if (commandsReceiver != null) 
+                    if (commandsReceivers != null) 
                     {
                         if (Debug.isDebugBuild) 
                         {
-                            Debug.Log($"{nameof(RNBridge)}: receive for <{entityName}> handshake");
+                            Debug.Log($"{nameof(RNBridge)}: receive handshake");
                         }
                         RNBridge.SendHandshake(new RNMessageHandshake());
                     }
@@ -222,18 +231,18 @@ namespace Wowmaking.RNU
                 unityScheduler);
         }
 
-        [AOT.MonoPInvokeCallback(typeof(System.Action<string, string>))]
-        private static void ReceiveCommand(string entityName, string message) 
+        [AOT.MonoPInvokeCallback(typeof(System.Action<string>))]
+        private static void ReceiveCommand(string message) 
         {
             System.Threading.Tasks.Task.Factory.StartNew(() =>
                 {
-                    if (commandsReceiver != null)
+                    if (commandsReceivers != null)
                     {
                         if (Debug.isDebugBuild) 
                         {
-                            Debug.Log($"{nameof(RNBridge)}: receive for <{entityName}> command <{message}>");
+                            Debug.Log($"{nameof(RNBridge)}: receive command <{message}>");
                         }            
-                        commandsReceiver.HandleCommand(new RNCommand(message));
+                        commandsReceivers?.Invoke(new RNCommand(message));
                     }
                 }, 
                 System.Threading.CancellationToken.None,
@@ -244,7 +253,7 @@ namespace Wowmaking.RNU
         interface IUnityReact 
         {
             bool IsAvailable();
-            void SetReceiver(System.Action<string> handshake, System.Action<string, string> command);
+            void SetReceiver(System.Action handshake, System.Action<string> command);
             void SendMessage(string message);
         }
 
@@ -255,7 +264,7 @@ namespace Wowmaking.RNU
                 return RNUProxyIsAvailable();
             }
 
-            void IUnityReact.SetReceiver(System.Action<string> handshake, System.Action<string, string> command)
+            void IUnityReact.SetReceiver(System.Action handshake, System.Action<string> command)
             {
                 RNUProxySetReceiver(handshake, command);
             }
@@ -268,7 +277,7 @@ namespace Wowmaking.RNU
             [DllImport("__Internal")]
             public static extern bool RNUProxyIsAvailable();
             [DllImport("__Internal")]
-            public static extern void RNUProxySetReceiver(System.Action<string> handshake, System.Action<string, string> command);
+            public static extern void RNUProxySetReceiver(System.Action handshake, System.Action<string> command);
             [DllImport("__Internal")]
             public static extern void RNUProxySendMessage(string message);
         }
@@ -288,7 +297,7 @@ namespace Wowmaking.RNU
                 return unityReactActivity != null;
             }
 
-            void IUnityReact.SetReceiver(System.Action<string> handshake, System.Action<string, string> command) 
+            void IUnityReact.SetReceiver(System.Action handshake, System.Action<string> command) 
             {
                 unityReactActivity.Call("setReceiver", new AndroidReceiver(handshake, command));
             }
@@ -300,10 +309,10 @@ namespace Wowmaking.RNU
 
             private class AndroidReceiver : AndroidJavaProxy 
             {
-                private readonly System.Action<string> proxyHandshake;
-                private readonly System.Action<string, string> proxyCommand;
+                private readonly System.Action proxyHandshake;
+                private readonly System.Action<string> proxyCommand;
 
-                public AndroidReceiver(System.Action<string> handshake, System.Action<string, string> command) 
+                public AndroidReceiver(System.Action handshake, System.Action<string> command) 
                     : base("com.wowmaking.rnunity.UnityReactActivity$IUnityReceiver")
                 {
                     proxyHandshake = handshake;
@@ -311,15 +320,15 @@ namespace Wowmaking.RNU
                 }
 
                 [UnityEngine.Scripting.Preserve]
-                void receiveHandshake(string entityName)
+                void receiveHandshake()
                 {
-                    proxyHandshake(entityName);
+                    proxyHandshake();
                 }
 
                 [UnityEngine.Scripting.Preserve]
-                void receiveCommand(string entityName, string arg) 
+                void receiveCommand(string arg) 
                 {
-                    proxyCommand(entityName, arg);
+                    proxyCommand(arg);
                 }
             }
         }

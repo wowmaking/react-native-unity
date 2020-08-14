@@ -28,8 +28,8 @@
 @end
 
 
-typedef void (*unity_receive_handshake)(const char *);
-typedef void (*unity_receive_command)(const char *, const char *);
+typedef void (*unity_receive_handshake)();
+typedef void (*unity_receive_command)(const char *);
 
 
 @interface RNUnity : RCTEventEmitter <RCTBridgeModule>
