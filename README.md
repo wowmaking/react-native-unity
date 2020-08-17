@@ -35,7 +35,7 @@
     {
         private void Awake()
         {
-            RNBridge.SetCommandsReceiver(this);
+            RNBridge.RegisterCommandsReceiver(this);
         }
     }
     ```
@@ -47,7 +47,7 @@
     {
         private void Awake()
         {
-            RNBridge.SetCommandsReceiver(this);
+            RNBridge.RegisterCommandsReceiver(this);
         }
         
         public void HandleCommand(RNCommand command)
@@ -266,7 +266,7 @@ const App = () => {
     ```
 ##### **`static RNBridge`**
 ###### Methods
-1. `SetCommandsReceiver` - set commands reveiver to bridge
+1. `RegisterCommandsReceiver` - add commands reveiver to bridge
     Params:
     - `cReceiver` (`IRNCommandsReceiver`) - game object, that implements IRNCommandsReceiver interface
         
@@ -274,7 +274,7 @@ const App = () => {
     ```c
     private void Awake()
     {
-        RNBridge.SetCommandsReceiver(this);
+        RNBridge.RegisterCommandsReceiver(this);
     }
     ```
 2. `SendEvent` - send event to JavaScript

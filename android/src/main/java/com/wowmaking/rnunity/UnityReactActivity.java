@@ -128,7 +128,7 @@ public class UnityReactActivity extends ReactActivity implements IUnityPlayerLif
     @Override public void onUnityPlayerQuitted() {
     }
 
-    @Override protected void onNewIntent(Intent intent)
+    @Override public void onNewIntent(Intent intent)
     {
         // To support deep linking, we need to make sure that the client can get access to
         // the last sent intent. The clients access this through a JNI api that allows them
