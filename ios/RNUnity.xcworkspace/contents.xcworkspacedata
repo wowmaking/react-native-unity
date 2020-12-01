@@ -4,7 +4,4 @@
    <FileRef
       location = "group:RNUnity/RNUnity.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:RNUProxy/RNUProxy.xcodeproj">
-   </FileRef>
 </Workspace>

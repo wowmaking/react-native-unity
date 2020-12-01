@@ -12,6 +12,6 @@ public class UnityResponderView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return UnityReactActivity.instance.onTouchEvent(event);
+        return UnityReactActivity.getInstance().onTouchEvent(event);
     }
 }
