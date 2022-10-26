@@ -22,7 +22,7 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "react-native": "^0.41.2"
+    "react-native": "^0.70.0"
   },
   "dependencies": {
     "event-target-shim": "^5.0.1",
