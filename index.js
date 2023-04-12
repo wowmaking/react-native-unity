@@ -10,8 +10,6 @@ import { EventTarget, } from 'event-target-shim';
 const { RNUnity, } = NativeModules;
 const RNUnityEventEmitter = new NativeEventEmitter(RNUnity);
 
-const COMMANDS_DELEGATE_FN_NAME = 'HandleCommand';
-
 let commandsIdIterator = 0;
 
 class UnityManager extends EventTarget {
@@ -35,18 +33,11 @@ class UnityManager extends EventTarget {
   _commandsMap = {};
 
   /**
-   * Unity commands delegate name
-   * @type {string}
-   */
-  delegateName = null;
-
-  /**
    * 
    * Initialize unity
-   * @param {string} delegateName name of GameObj, that implements IRNCommandsDelegate interface at unity
+   * 
    */
-  init(delegateName = '') {
-    this.delegateName = delegateName;
+  init() {
     RNUnity.initialize();
     this._subscriber = RNUnityEventEmitter.addListener('UnityMessage', this._handleMessage.bind(this));
 
@@ -67,12 +58,9 @@ class UnityManager extends EventTarget {
 
   handshake = () => {
     if (!this._handshake.resolved) {
-      this._invoke({
-        entityName: this.delegateName,
-        functionName: 'HandShake',
-      });
+      this._invokeHandshake();
 
-      setTimeout(this.handshake, 100);
+      setTimeout(this.handshake, 300);
     }
   }
 
@@ -89,9 +77,7 @@ class UnityManager extends EventTarget {
     const command = new UnityCommand(id, name, data);
     this._commandsMap[id] = command;
 
-    this._invoke({
-      entityName: this.delegateName,
-      functionName: COMMANDS_DELEGATE_FN_NAME,
+    this._invokeCommand({
       message: command.getMessage(),
     });
 
@@ -100,15 +86,21 @@ class UnityManager extends EventTarget {
 
   /**
    * 
-   * Invoke entity method
+   * invoke handshake method
+   * 
+   */
+  _invokeHandshake() {
+    RNUnity.invokeHandshake();
+  }
+
+  /**
+   * 
+   * invoke entity method
    * @private
-   * @param {Object} options
-   * @param {string} options.entityName Unity entity name
-   * @param {string} options.functionName Unity entity script component function
    * @param {string=} options.message Unity entity script component function param
    */
-  _invoke({ entityName, functionName, message = '', }) {
-    RNUnity.invoke(entityName, functionName, message);
+  _invokeCommand({ message = '', }) {
+    RNUnity.invokeCommand(message);
   }
 
   /**
@@ -132,15 +124,15 @@ class UnityManager extends EventTarget {
           break;
 
         case 'result':
-          const { id, resolved, } = messageData;
+          const { id, resolved, result } = data;
           if (this._commandsMap[id]) {
             const command = this._commandsMap[id];
 
             if (resolved) {
-              command.resolve(data);
+              command.resolve(result);
             }
             else {
-              command.reject(data);
+              command.reject(result);
             }
 
             delete this._commandsMap[id];

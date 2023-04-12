@@ -34,13 +34,18 @@ public class RNUnityModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void invoke(String entityName, String functionName, String message) {
-        UnityReactActivity.UnitySendMessage(entityName, functionName, message);
+    public void invokeHandshake() {
+        UnityReactActivity.getInstance().unitySendHandshake();
     }
 
-    public static void sendEvent(String eventName, @Nullable String params) {
-        RNUnityModule.getInstance().reactContext
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, params);
+    @ReactMethod
+    public void invokeCommand(String message) {
+        UnityReactActivity.getInstance().unitySendCommand(message);
+    }
+
+    public void sendEvent(String eventName, @Nullable String params) {
+        reactContext
+        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+        .emit(eventName, params);
     }
 }

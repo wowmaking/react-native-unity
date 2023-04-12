@@ -1,5 +1,8 @@
 {
     "name": "Wowmaking.RNU.Editor",
+    "includePlatforms": [
+        "Editor"
+    ],
     "optionalUnityReferences": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
