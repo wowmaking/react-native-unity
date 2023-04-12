@@ -201,23 +201,27 @@ const App = () => {
     
     Usage:
     ```javascript
-    Unity.init(;
+    Unity.init();
     ```
 2. `execCommand` - send command to Unity
+    
     Params: 
     - `name` (`string`) - Unity command name
     - `data` (`Object`, optional) - Unity command data
     
     Return `Promise`
+    
     Usage:
     ```javascript
     Unity.execCommand('command_name', { a: 1, b: 'b', })
     ```
 3. `addEventListener` - add listener of Unity events
+    
     Params:
         - `type` (`string`) - type of Unity event
         - `listener` (`function`) - function, that's calling on Unity event receiving
         
+    
     Usage:
     ```javascript
     Unity.addEventListener('event_type', (e) => { console.warn(e); });
@@ -240,6 +244,7 @@ const App = () => {
 ##### **`interface IRNCommandsReceiver`** - interface to receive commands from JaveScript
 ###### Methods:
 1. `void HandleCommand(RNCommand command)` - method, that calls from JavaScript
+    
     Params:
     - `command` (`RNCommand`) - command object, received from JavaScript
     
@@ -249,6 +254,7 @@ const App = () => {
 2. `data` (`object`) - data of received command
 ###### Methods
 1. `Resolve` - invoke on successful command execution
+    
     Params:
     - `data` (`object`, optional) - object, that will receive JavaScript
         
@@ -257,6 +263,7 @@ const App = () => {
     command.Resolve(new { text = "test", });
     ```
 2. `Reject` - invoke on unsuccessful command execution
+    
     Params:
     - `data` (`object`, optional) - object, that will receive JavaScript
         
@@ -267,6 +274,7 @@ const App = () => {
 ##### **`static RNBridge`**
 ###### Methods
 1. `RegisterCommandsReceiver` - add commands reveiver to bridge
+
     Params:
     - `cReceiver` (`IRNCommandsReceiver`) - game object, that implements IRNCommandsReceiver interface
         
@@ -278,6 +286,7 @@ const App = () => {
     }
     ```
 2. `SendEvent` - send event to JavaScript
+    
     Params:
     - `name` (`string`) - event name, that receive JavaScript
     - `data` (`object`) - data object, that receive JavaScript listeners
