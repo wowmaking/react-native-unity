@@ -2,25 +2,17 @@
   "name": "@wowmaking/react-native-unity",
   "version": "0.5.0",
   "description": "React Native package to use Unity as library with RN app",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [
     "react-native",
     "unity"
   ],
+  "author": "Wowmaking",
+  "license": "MIT",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/wowmaking/react-native-unity.git"
   },
-  "homepage": "https://github.com/wowmaking/react-native-unity#README",
-  "author": {
-    "name": "Gleb Volchetskiy",
-    "email": "g.volchetskiy@wowmaking.net",
-    "url": "https://github.com/wowmaking"
-  },
-  "license": "MIT",
   "peerDependencies": {
     "react-native": "^0.70.0"
   },
