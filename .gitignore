@@ -10,7 +10,6 @@ package-lock.json
 npm-debug.log
 yarn-error.log
   
-
 # Xcode
 #
 build/
@@ -41,6 +40,10 @@ local.properties
 *.iml
 
 # BUCK
+#
 buck-out/
 \.buckd/
 *.keystore
+
+## Package
+dist
