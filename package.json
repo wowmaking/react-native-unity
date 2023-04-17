@@ -8,14 +8,27 @@
   ],
   "author": "Wowmaking",
   "license": "MIT",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/wowmaking/react-native-unity.git"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prepublishOnly": "tsc"
+  },
   "dependencies": {
-    "event-target-shim": "^5.0.1",
+    "event-target-shim": "^5.0.1"
+  },
+  "peerDependencies": {
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.35",
     "react": "^18.2.0",
-    "react-native": "^0.71.4"
+    "react-native": "^0.71.4",
+    "typescript": "^5.0.4"
   }
 }
