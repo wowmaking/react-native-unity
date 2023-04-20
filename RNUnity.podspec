@@ -7,10 +7,10 @@ Pod::Spec.new do |s|
   s.version      = package['version']
   s.summary      = package['description']
   s.license      = package['license']
-  s.homepage     = package['homepage']
+  s.homepage     = package['repository']['url']
   s.authors      = package['author']
-  s.platform     = :ios, "10.0"
-  s.source       = { :git => package['repository']['url'], :tag => "master" }
+  s.platform     = :ios, "13.0"
+  s.source       = { :git => s.homepage, :tag => "v#{s.version}" }
   s.source_files  = "ios/RNUnity/**/*.{h,m}"
   s.requires_arc = true
 
@@ -19,5 +19,3 @@ Pod::Spec.new do |s|
   s.dependency "React"
 
 end
-
-  
