@@ -15,7 +15,7 @@ const RNUnityEventEmitter = new NativeEventEmitter(RNUnity);
 class UnityManager extends EventTarget {
   private handshake: UnityCommand | null = null;
   private handshakeResolved: boolean = false;
-  private commandsMap: { [id: number]: UnityCommand } = {};
+  private commandsMap: { [id: number]: UnityCommand<any> } = {};
   private commandsIdIterator: number = 0;
 
   constructor() {
@@ -44,9 +44,9 @@ class UnityManager extends EventTarget {
     return this.handshake.promise;
   }
 
-  execCommand(name: string, data?: object) {
+  execCommand<R = undefined>(name: string, data?: object) {
     const id = ++this.commandsIdIterator;
-    const command = new UnityCommand(id, name, data);
+    const command = new UnityCommand<R>(id, name, data);
 
     this.commandsMap[id] = command;
     this.invokeCommand(command.getMessage());
@@ -105,12 +105,12 @@ class UnityManager extends EventTarget {
   }
 }
 
-class UnityCommand {
+class UnityCommand<R = undefined> {
   private id: number | null = null;
   private name: string | null = null;
   private data: object | null = null;
 
-  promise: Promise<any>;
+  promise: Promise<R>;
   resolve: (result?: any) => void;
   reject: (result?: any) => void;
 

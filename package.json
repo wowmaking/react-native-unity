@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "prepublishOnly": "tsc"
+    "prepack": "tsc"
   },
   "dependencies": {
     "event-target-shim": "^5.0.1"
