@@ -354,3 +354,13 @@ You can add some useful commands to `package.json` file of your RN project:
 ```
 
 Replace `2020.3.44f1` with your Unity version
+
+## Known issues
+
+Due to changes in the Android native code in `2020.3.46+`, `2021.3.19+`, `2022.2.4+` versions of the Unity Editor, interaction with the Unity stops working with an error:
+
+```
+RNBridge: exception during try set receiver <java.lang.NoSuchFieldError: no "Ljava/lang/Object;" field "mUnityPlayer" in class "Lapp/example/MainActivity;" or its superclasses>
+```
+
+We are working on a solution
